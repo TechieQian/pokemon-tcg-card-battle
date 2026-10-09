@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokémon TCG Card Battle | Mega Evolutions & Quickness Dodge</title>
+  <meta name="description" content="A 10-round Pokémon card battle featuring Charizard, Dragonite, Mega Evolutions at 4 faints, Quickness dodge mechanics, and 2x Type Weaknesses.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Canvas Overlay for Visual Effects & Beams -->
+  <canvas id="fx-canvas"></canvas>
+
+  <!-- Starter Pokémon Selection Modal (Shown at Start) -->
+  <div class="selection-overlay" id="selection-modal">
+    <div class="selection-card">
+      <div class="selection-header">
+        <span class="pokeball-icon">⚽</span>
+        <h2>CHOOSE YOUR STARTER POKÉMON</h2>
+        <p>Select your Pokémon for the 10-Round Championship! (Mega Evolves at 4 Faints!)</p>
+      </div>
+
+      <div class="starter-options-grid">
+        <!-- Pikachu Option -->
+        <div class="starter-option-card type-electric" id="select-pikachu-btn">
+          <div class="option-badge">⚡ ELECTRIC (20% DODGE)</div>
+          <img src="assets/pikachu.jpg" alt="Pikachu" class="starter-art">
+          <h3>Pikachu</h3>
+          <p class="starter-desc">Evolves into <strong>Raichu</strong> ➔ <strong>Mega Raichu GX</strong>!</p>
+          <button class="choose-btn">CHOOSE PIKACHU</button>
+        </div>
+
+        <!-- Eevee Option -->
+        <div class="starter-option-card type-normal" id="select-eevee-btn">
+          <div class="option-badge">⭐ EVOLUTION (25% DODGE)</div>
+          <img src="assets/eevee.jpg" alt="Eevee" class="starter-art">
+          <h3>Eevee</h3>
+          <p class="starter-desc">Choose evolution: <strong>Jolteon, Vaporeon, Flareon, Espeon</strong> ➔ <strong>Mega Form</strong>!</p>
+          <button class="choose-btn">CHOOSE EEVEE</button>
+        </div>
+
+        <!-- Charizard Option -->
+        <div class="starter-option-card type-fire" id="select-charizard-btn">
+          <div class="option-badge">🔥 FIRE (15% DODGE)</div>
+          <img src="assets/charizard.jpg" alt="Charizard" class="starter-art">
+          <h3>Charizard</h3>
+          <p class="starter-desc">Evolves into <strong>Mega Charizard X</strong>! Massive flame attacks.</p>
+          <button class="choose-btn">CHOOSE CHARIZARD</button>
+        </div>
+
+        <!-- Dragonite Option -->
+        <div class="starter-option-card type-dragon" id="select-dragonite-btn">
+          <div class="option-badge">🐉 DRAGON (15% DODGE)</div>
+          <img src="assets/dragonite.jpg" alt="Dragonite" class="starter-art">
+          <h3>Dragonite</h3>
+          <p class="starter-desc">Evolves into <strong>Mega Dragonite VMAX</strong>! Cosmic dragon beams.</p>
+          <button class="choose-btn">CHOOSE DRAGONITE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Eeveelution Choice Modal -->
+  <div class="selection-overlay hidden" id="eeveelution-modal">
+    <div class="selection-card eevee-choice-card">
+      <div class="selection-header">
+        <span class="pokeball-icon">✨</span>
+        <h2>YOUR EEVEE IS EVOLVING!</h2>
+        <p>Choose which powerful Stage 1 Eeveelution you want to evolve into!</p>
+      </div>
+
+      <div class="eevee-choice-grid">
+        <div class="eevee-option-card type-electric" data-eeveelution="jolteon">
+          <div class="option-badge">⚡ JOLTEON (95 HP • 25% DODGE)</div>
+          <img src="assets/jolteon.jpg" alt="Jolteon" class="eevee-art">
+          <h4>Jolteon</h4>
+          <span class="eevee-move-tag">Pin Missile (30) • Thunder Fang (50)</span>
+          <button class="choose-btn mini-btn">EVOLVE</button>
+        </div>
+
+        <div class="eevee-option-card type-water" data-eeveelution="vaporeon">
+          <div class="option-badge">💧 VAPOREON (110 HP • 20% DODGE)</div>
+          <img src="assets/vaporeon.jpg" alt="Vaporeon" class="eevee-art">
+          <h4>Vaporeon</h4>
+          <span class="eevee-move-tag">Water Gun (30) • Hydro Pump (48)</span>
+          <button class="choose-btn mini-btn">EVOLVE</button>
+        </div>
+
+        <div class="eevee-option-card type-fire" data-eeveelution="flareon">
+          <div class="option-badge">🔥 FLAREON (100 HP • 20% DODGE)</div>
+          <img src="assets/flareon.jpg" alt="Flareon" class="eevee-art">
+          <h4>Flareon</h4>
+          <span class="eevee-move-tag">Bite (30) • Flamethrower (52)</span>
+          <button class="choose-btn mini-btn">EVOLVE</button>
+        </div>
+
+        <div class="eevee-option-card type-psychic" data-eeveelution="espeon">
+          <div class="option-badge">🔮 ESPEON (95 HP • 20% DODGE)</div>
+          <img src="assets/espeon.jpg" alt="Espeon" class="eevee-art">
+          <h4>Espeon</h4>
+          <span class="eevee-move-tag">Psybeam (32) • Psychic (50)</span>
+          <button class="choose-btn mini-btn">EVOLVE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-container">
+    <!-- Header Controls & Title -->
+    <header class="game-header">
+      <div class="logo-badge">
+        <span class="pokeball-icon">⚽</span>
+        <h1>POKÉMON CARD CHAMPIONSHIP</h1>
+      </div>
+      
+      <!-- Tournament Score Board -->
+      <div class="scoreboard-bar">
+        <div class="score-team team-pikachu">
+          <span class="team-name" id="score-name-pikachu">Pikachu</span>
+          <span class="team-score" id="score-val-pikachu">0</span>
+        </div>
+        <div class="score-round-pill">
+          <span class="round-title">ROUND</span>
+          <span class="round-counter" id="round-counter-text">1 / 10</span>
+        </div>
+        <div class="score-team team-eevee">
+          <span class="team-score" id="score-val-eevee">0</span>
+          <span class="team-name" id="score-name-eevee">Eevee</span>
+        </div>
+      </div>
+
+      <div class="top-controls">
+        <button id="change-starter-btn" class="control-btn" title="Choose Starter Pokémon">
+          <span class="btn-icon">🔄</span> Change Pokémon
+        </button>
+        <button id="ai-toggle-btn" class="control-btn active" title="Toggle Auto Counter-Attack by CPU">
+          <span class="btn-icon">🤖</span> Auto CPU: <strong id="ai-status-text">ON</strong>
+        </button>
+        <button id="audio-toggle-btn" class="control-btn" title="Toggle Sound FX">
+          <span class="btn-icon">🔊</span> Sound: <strong id="audio-status-text">ON</strong>
+        </button>
+        <button id="restart-round-btn" class="control-btn restart-btn" title="Restart Current Round">
+          <span class="btn-icon">⚡</span> Restart Round
+        </button>
+        <button id="pass-turn-btn" class="control-btn pass-btn" title="Pass Turn to opponent">
+          <span class="btn-icon">⏭️</span> Pass Turn
+        </button>
+        <button id="reset-btn" class="control-btn reset-btn" title="Reset Entire Tournament">
+          <span class="btn-icon">🏆</span> New Match
+        </button>
+      </div>
+    </header>
+
+    <!-- Battle Arena / Table -->
+    <main class="battle-table">
+      <div class="turn-banner" id="turn-banner">
+        <span class="turn-pulse"></span>
+        <span id="turn-text">Energy attached! Choose a move to attack!</span>
+      </div>
+
+      <!-- Cards Container -->
+      <div class="cards-wrapper">
+        
+        <!-- CARD 1: PLAYER 1 CARD -->
+        <div class="pokemon-card-container" id="card-container-pikachu">
+          <div class="player-role-badge player-tag" id="role-badge-pikachu">YOU (P1)</div>
+          <div class="pokemon-card type-electric" id="card-pikachu" data-pokemon="pikachu">
+            <div class="holo-sheen"></div>
+            
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="stage-tag" id="stage-tag-pikachu">BASIC</span>
+                <h2 class="pokemon-name" id="name-display-pikachu">Pikachu</h2>
+              </div>
+              <div class="hp-group">
+                <span class="hp-label">HP</span>
+                <span class="hp-value" id="hp-text-pikachu">60</span>
+                <div class="type-icon electric-type-bg" id="type-icon-pikachu" title="Electric Type">⚡</div>
+              </div>
+            </div>
+
+            <div class="hp-bar-container">
+              <div class="hp-bar-fill electric-fill" id="hp-bar-pikachu" style="width: 100%;"></div>
+            </div>
+
+            <!-- Energy & Quickness Stat Bar -->
+            <div class="energy-tracker-bar" id="energy-tracker-pikachu">
+              <span class="energy-label">Energy:</span>
+              <div class="energy-orbs-container" id="energy-orbs-pikachu"></div>
+              <span class="quickness-badge" id="quickness-badge-pikachu">💨 Dodge: 20%</span>
+            </div>
+
+            <div class="faint-tracker-bar">
+              <span class="faint-label">Faints:</span>
+              <span class="faint-badges" id="faint-badges-pikachu">⚪ ⚪ ⚪ ⚪ (Mega at 4)</span>
+            </div>
+
+            <div class="art-frame">
+              <img src="assets/pikachu.jpg" alt="Pikachu Card Art" id="art-img-pikachu" class="pokemon-art">
+              <span class="art-number" id="art-desc-pikachu">NO. 025 Mouse Pokémon HT: 1'04" WT: 13.2 lbs.</span>
+            </div>
+
+            <div class="card-body" id="moves-container-pikachu"></div>
+
+            <div class="card-click-prompt">
+              <span id="prompt-pikachu">⚡ Click Card to Attack!</span>
+            </div>
+
+            <div class="card-footer">
+              <div class="stat-col">
+                <span class="footer-label">weakness</span>
+                <span class="footer-val" id="weakness-pikachu">🥊 ×2 (2x DMG)</span>
+              </div>
+              <div class="stat-col">
+                <span class="footer-label">resistance</span>
+                <span class="footer-val" id="resistance-pikachu">⚙️ -20</span>
+              </div>
+              <div class="stat-col">
+                <span class="footer-label">retreat</span>
+                <span class="footer-val">⭐</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VS Divider Badge -->
+        <div class="vs-badge" id="vs-badge">VS</div>
+
+        <!-- CARD 2: CPU CARD -->
+        <div class="pokemon-card-container" id="card-container-eevee">
+          <div class="player-role-badge cpu-tag" id="role-badge-eevee">CPU</div>
+          <div class="pokemon-card type-normal" id="card-eevee" data-pokemon="eevee">
+            <div class="holo-sheen"></div>
+
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="stage-tag" id="stage-tag-eevee">BASIC</span>
+                <h2 class="pokemon-name" id="name-display-eevee">Eevee</h2>
+              </div>
+              <div class="hp-group">
+                <span class="hp-label">HP</span>
+                <span class="hp-value" id="hp-text-eevee">60</span>
+                <div class="type-icon normal-type-bg" id="type-icon-eevee" title="Normal Type">⭐</div>
+              </div>
+            </div>
+
+            <div class="hp-bar-container">
+              <div class="hp-bar-fill normal-fill" id="hp-bar-eevee" style="width: 100%;"></div>
+            </div>
+
+            <!-- Energy & Quickness Stat Bar -->
+            <div class="energy-tracker-bar" id="energy-tracker-eevee">
+              <span class="energy-label">Energy:</span>
+              <div class="energy-orbs-container" id="energy-orbs-eevee"></div>
+              <span class="quickness-badge" id="quickness-badge-eevee">💨 Dodge: 25%</span>
+            </div>
+
+            <div class="faint-tracker-bar">
+              <span class="faint-label">Faints:</span>
+              <span class="faint-badges" id="faint-badges-eevee">⚪ ⚪ ⚪ ⚪ (Mega at 4)</span>
+            </div>
+
+            <div class="art-frame">
+              <img src="assets/eevee.jpg" alt="Eevee Card Art" id="art-img-eevee" class="pokemon-art">
+              <span class="art-number" id="art-desc-eevee">NO. 133 Evolution Pokémon HT: 1'00" WT: 14.3 lbs.</span>
+            </div>
+
+            <div class="card-body" id="moves-container-eevee"></div>
+
+            <div class="card-click-prompt">
+              <span id="prompt-eevee">⭐ Click Card to Attack!</span>
+            </div>
+
+            <div class="card-footer">
+              <div class="stat-col">
+                <span class="footer-label">weakness</span>
+                <span class="footer-val" id="weakness-eevee">🥊 ×2 (2x DMG)</span>
+              </div>
+              <div class="stat-col">
+                <span class="footer-label">resistance</span>
+                <span class="footer-val" id="resistance-eevee">none</span>
+              </div>
+              <div class="stat-col">
+                <span class="footer-label">retreat</span>
+                <span class="footer-val">⭐</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <footer class="battle-log-container">
+      <div class="log-header">
+        <span class="log-title">⚡ BATTLE COMMENTARY</span>
+        <span class="log-badge" id="log-round-badge">ROUND 1 OF 10</span>
+      </div>
+      <div class="log-box" id="log-box">
+        <p class="log-entry log-system">💨 Quickness Dodge active! High speed Pokémon have a chance to <strong>completely dodge incoming attacks!</strong> Mega Evolves at 4 Faints!</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Victory Overlay Modal -->
+  <div class="victory-overlay hidden" id="victory-modal">
+    <div class="victory-card">
+      <div class="victory-header">
+        <span class="crown-icon" id="modal-crown">👑</span>
+        <h2 id="winner-title">PIKACHU WINS ROUND 1!</h2>
+      </div>
+      <p id="winner-subtitle">Eevee has fainted!</p>
+
+      <div class="winner-preview" id="winner-preview-container"></div>
+
+      <button id="rematch-btn" class="rematch-btn">
+        <span id="rematch-btn-text">⚡ START ROUND 2 ⚡</span>
+      </button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
