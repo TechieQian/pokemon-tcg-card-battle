@@ -1305,6 +1305,8 @@ document.addEventListener('DOMContentLoaded', () => {
   /* --------------------------------------------------------------------------
      ROUND END & TOURNAMENT RESET
      -------------------------------------------------------------------------- */
+  let roundAutoTimer = null;
+
   function handleRoundEnd(winnerKey, loserKey, loserCard) {
     gameState.isAnimating = false;
 
@@ -1334,14 +1336,29 @@ document.addEventListener('DOMContentLoaded', () => {
         winnerTitle.textContent = `${winner.name.toUpperCase()} WINS ROUND ${gameState.currentRound}!`;
         winnerSubtitle.textContent = `${loser.name} fainted! Score: ${gameState.pikachu.name} ${gameState.scores.pikachu} - ${gameState.scores.eevee} ${gameState.eevee.name}`;
 
+        let countdown = 2;
+        rematchBtnText.textContent = `⚡ NEXT ROUND IN ${countdown}S ⚡`;
         winnerPreviewContainer.innerHTML = `
           <div style="font-size: 1.1rem; font-weight: bold; color: #ffde00;">
-            Tournament Progress: Round ${gameState.currentRound} of ${gameState.maxRounds} Complete!
+            Auto-advancing to Round ${gameState.currentRound + 1} of ${gameState.maxRounds}...
           </div>
         `;
-
-        rematchBtnText.textContent = `⚡ START ROUND ${gameState.currentRound + 1} ⚡`;
         victoryModal.classList.remove('hidden');
+
+        if (roundAutoTimer) clearInterval(roundAutoTimer);
+
+        roundAutoTimer = setInterval(() => {
+          countdown--;
+          if (countdown > 0) {
+            rematchBtnText.textContent = `⚡ NEXT ROUND IN ${countdown}S ⚡`;
+          } else {
+            clearInterval(roundAutoTimer);
+            roundAutoTimer = null;
+            if (eeveelutionModal.classList.contains('hidden')) {
+              startNextRoundOrReset();
+            }
+          }
+        }, 1000);
       }
     }, 700);
   }
@@ -1453,6 +1470,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function startNextRoundOrReset() {
+    if (roundAutoTimer) {
+      clearInterval(roundAutoTimer);
+      roundAutoTimer = null;
+    }
+
     if (gameState.tournamentOver || gameState.currentRound >= gameState.maxRounds) {
       victoryModal.classList.add('hidden');
       selectionModal.classList.remove('hidden');
